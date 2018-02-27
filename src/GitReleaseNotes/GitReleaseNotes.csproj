@@ -42,8 +42,8 @@
     <Reference Include="LibGit2Sharp">
       <HintPath>..\packages\LibGit2Sharp.0.20.2.0\lib\net40\LibGit2Sharp.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit">
-      <HintPath>..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.29.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.105.0.1\lib\net4\RestSharp.dll</HintPath>

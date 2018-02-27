@@ -108,11 +108,11 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             GetRepository(arguments, out organisation, out repository);
 
             var gitHubClient = gitHubClientFactory();
-            var forRepository = gitHubClient.Issue.GetForRepository(organisation, repository, new RepositoryIssueRequest
+            var forRepository = gitHubClient.Issue.GetAllForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
-                State = ItemState.Closed
+                State = ItemStateFilter.Closed
             });
             var readOnlyList = forRepository.Result.Where(i => i.ClosedAt > since);
 
@@ -133,7 +133,7 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             return readOnlyList.Select(i => new OnlineIssue
             {
                 Id = "#" + i.Number.ToString(CultureInfo.InvariantCulture),
-                HtmlUrl = i.HtmlUrl,
+                HtmlUrl = new Uri(i.HtmlUrl),
                 Title = i.Title,
                 IssueType = i.PullRequest == null ? IssueType.Issue : IssueType.PullRequest,
                 Labels = i.Labels.Select(l => l.Name).ToArray(),

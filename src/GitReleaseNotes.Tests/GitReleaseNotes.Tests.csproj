@@ -47,8 +47,8 @@
     <Reference Include="NSubstitute">
       <HintPath>..\packages\NSubstitute.1.8.1.0\lib\net45\NSubstitute.dll</HintPath>
     </Reference>
-    <Reference Include="Octokit">
-      <HintPath>..\packages\Octokit.0.6.2\lib\net45\Octokit.dll</HintPath>
+    <Reference Include="Octokit, Version=0.29.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.29.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\packages\Shouldly.2.2.1\lib\net40\Shouldly.dll</HintPath>
