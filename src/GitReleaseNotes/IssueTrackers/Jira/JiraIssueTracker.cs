@@ -6,42 +6,48 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 {
     public class JiraIssueTracker : IIssueTracker
     {
-        private static readonly ILog Log = GitReleaseNotesEnvironment.Log;
-
-        private readonly Context context;
+        private readonly GitReleaseNotesArguments arguments;
         private readonly IJiraApi jiraApi;
+        private readonly ILog log;
 
-        public JiraIssueTracker(IJiraApi jiraApi, Context context)
+        public JiraIssueTracker(IJiraApi jiraApi, ILog log, GitReleaseNotesArguments arguments)
         {
             this.jiraApi = jiraApi;
-            this.context = context;
+            this.log = log;
+            this.arguments = arguments;
         }
 
-        public bool VerifyArgumentsAndWriteErrorsToLog()
+        public bool VerifyArgumentsAndWriteErrorsToConsole()
         {
-            if (string.IsNullOrEmpty(context.Jira.JiraServer) ||
-                !Uri.IsWellFormedUriString(context.Jira.JiraServer, UriKind.Absolute))
+            if (string.IsNullOrEmpty(arguments.JiraServer) ||
+                !Uri.IsWellFormedUriString(arguments.JiraServer, UriKind.Absolute))
             {
-                Log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
+                log.WriteLine("A valid Jira server must be specified [/JiraServer ]");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(context.ProjectId))
+            if (string.IsNullOrEmpty(arguments.ProjectId))
             {
-                Log.WriteLine("/ProjectId is a required parameter for Jira");
+                log.WriteLine("/JiraProjectId is a required parameter for Jira");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(context.Authentication.Username))
+            if (string.IsNullOrEmpty(arguments.Username))
             {
-                Log.WriteLine("/Username is a required to authenticate with Jira");
+                log.WriteLine("/Username is a required to authenticate with Jira");
+                return false;
+            }
+            if (string.IsNullOrEmpty(arguments.Password))
+            {
+                log.WriteLine("/Password is a required to authenticate with Jira");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(context.Authentication.Password))
+            if (string.IsNullOrEmpty(arguments.Jql))
             {
-                Log.WriteLine("/Password is a required to authenticate with Jira");
-                return false;
+                arguments.Jql = string.Format("project = {0} AND " +
+                               "(issuetype = Bug OR issuetype = Story OR issuetype = \"New Feature\") AND " +
+                               "status in (Closed, Resolved)", arguments.ProjectId);
             }
 
             return true;
@@ -49,7 +55,7 @@ namespace GitReleaseNotes.IssueTrackers.Jira
 
         public IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since)
         {
-            return jiraApi.GetClosedIssues(context, since).ToArray();
+            return jiraApi.GetClosedIssues(arguments, since).ToArray();
         }
 
         public bool RemotePresentWhichMatches { get { return false; }}

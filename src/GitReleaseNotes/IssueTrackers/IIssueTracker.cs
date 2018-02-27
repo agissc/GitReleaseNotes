@@ -5,7 +5,7 @@ namespace GitReleaseNotes.IssueTrackers
 {
     public interface IIssueTracker
     {
-        bool VerifyArgumentsAndWriteErrorsToLog();
+        bool VerifyArgumentsAndWriteErrorsToConsole();
         IEnumerable<OnlineIssue> GetClosedIssues(DateTimeOffset? since);
         bool RemotePresentWhichMatches { get; }
         string DiffUrlFormat { get; }

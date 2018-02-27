@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using ApprovalTests;
 using GitReleaseNotes.Git;
 using GitReleaseNotes.IssueTrackers;
@@ -24,10 +23,10 @@ namespace GitReleaseNotes.Tests
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
+                repo, issueTracker, new SemanticReleaseNotes(), new string[0],
                 tagToStartFrom, currentReleaseInfo, issueTracker.DiffUrlFormat);
 
-            Approvals.Verify(releaseNotes.ToString(), Scrubber);
+            Approvals.Verify(releaseNotes.ToString());
         }
 
         [Fact]
@@ -45,13 +44,13 @@ namespace GitReleaseNotes.Tests
             var currentReleaseInfo = GitRepositoryInfoFinder.GetCurrentReleaseInfo(repo); 
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, new SemanticReleaseNotes(), new Categories(),
+                repo, issueTracker, new SemanticReleaseNotes(), new string[0],
                 tagToStartFrom, currentReleaseInfo, string.Empty);
 
-            Approvals.Verify(releaseNotes.ToString(), Scrubber);
+            Approvals.Verify(releaseNotes.ToString());
         }
 
-        [Fact(Skip = "To fix")]
+        [Fact]
         public void AppendOnlyNewItems()
         {
             IRepository repo;
@@ -86,13 +85,13 @@ Commits:  AC39885536...CA74E870F2
 Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, previousReleaseNotes, new Categories(),
+                repo, issueTracker, previousReleaseNotes, new string[0],
                 tagToStartFrom, currentReleaseInfo, string.Empty);
 
-            Approvals.Verify(releaseNotes.ToString(), Scrubber);
+            Approvals.Verify(releaseNotes.ToString());
         }
 
-        [Fact(Skip = "To fix")]
+        [Fact]
         public void KeepsCustomisations()
         {
 
@@ -143,15 +142,10 @@ Which spans multiple lines
 Commits: E413A880DB...F6924D7A0B");
 
             var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                repo, issueTracker, previousReleaseNotes, new Categories(),
+                repo, issueTracker, previousReleaseNotes, new string[0],
                 tagToStartFrom, currentReleaseInfo, "url/{0}...{1}");
 
-            Approvals.Verify(releaseNotes.ToString(), Scrubber);
-        }
-
-        private static string Scrubber(string approval)
-        {
-            return Regex.Replace(approval, @".{10}\.\.\..{10}", "AAAAAAAAAA...BBBBBBBBBB");
+            Approvals.Verify(releaseNotes.ToString());
         }
     }
 }

@@ -1,29 +1,28 @@
 ﻿using System.Linq;
 using GitReleaseNotes.FileSystem;
 using NSubstitute;
-using Shouldly;
 using Xunit;
 
 namespace GitReleaseNotes.Tests
 {
     public class ReleaseFileWriterTests
     {
-        private readonly IFileSystem fileSystem;
-        private readonly ReleaseFileWriter sut;
+        private readonly IFileSystem _fileSystem;
+        private readonly ReleaseFileWriter _sut;
 
         public ReleaseFileWriterTests()
         {
-            fileSystem = Substitute.For<IFileSystem>();
-            sut = new ReleaseFileWriter(fileSystem);
+            _fileSystem = Substitute.For<IFileSystem>();
+            _sut = new ReleaseFileWriter(_fileSystem);
         }
 
         [Fact]
         public void AbsolutePathIsWrittenToRepositoryRoot()
         {
-            sut.OutputReleaseNotesFile("Contents", "c:\\AnotherDir\\ReleaseFile.md");
+            _sut.OutputReleaseNotesFile("Contents", "c:\\AnotherDir\\ReleaseFile.md");
 
-            var fileName = fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
-            fileName.ShouldBe("c:\\AnotherDir\\ReleaseFile.md");
+            var fileName = _fileSystem.ReceivedCalls().Single(c => c.GetMethodInfo().Name == "WriteAllText").GetArguments()[0];
+            Assert.Equal("c:\\AnotherDir\\ReleaseFile.md", fileName);
         }
     }
 }

@@ -24,8 +24,9 @@ namespace GitReleaseNotes.Tests
 
         public TestDataCreator CreateRelease(string tag, params string[] issues)
         {
-            _releases.Add(Tuple.Create(tag, issues.Select(i => new OnlineIssue(GetNextId(), DateTime.Now)
+            _releases.Add(Tuple.Create(tag, issues.Select(i => new OnlineIssue
             {
+                Id = GetNextId(),
                 IssueType = IssueType.Issue,
                 Title = i
             }).ToArray()));
@@ -71,9 +72,11 @@ namespace GitReleaseNotes.Tests
             }
             foreach (var additionalIssue in _additionalIssues)
             {
-                closedIssues.Add(new OnlineIssue(GetNextId(), currentDate)
+                closedIssues.Add(new OnlineIssue
                 {
+                    Id = GetNextId(),
                     Title = additionalIssue,
+                    DateClosed = currentDate,
                     IssueType = IssueType.Issue
                 });
                 var commit = CreateCommit(currentDate);

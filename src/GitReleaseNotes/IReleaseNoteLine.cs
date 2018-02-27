@@ -2,6 +2,6 @@ namespace GitReleaseNotes
 {
     public interface IReleaseNoteLine
     {
-        string ToString(Categories categories);
+        string ToString(string[] categories);
     }
 }

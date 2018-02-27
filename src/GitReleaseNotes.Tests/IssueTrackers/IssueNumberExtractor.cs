@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using GitReleaseNotes.IssueTrackers;
 using LibGit2Sharp;
 using NSubstitute;
-using Shouldly;
 using Xunit;
 
 namespace GitReleaseNotes.Tests.IssueTrackers
@@ -30,8 +29,8 @@ namespace GitReleaseNotes.Tests.IssueTrackers
 
             var issueNumbers = new IssueNumberExtractor().GetIssueNumbers(new GitReleaseNotesArguments(), releases, new Regex("#(?<issueNumber>\\d+)"));
 
-            issueNumbers[releaseInfo].ShouldContain("123");
-            issueNumbers[releaseInfo].ShouldContain("51401");
+            Assert.Contains("123", issueNumbers[releaseInfo]);
+            Assert.Contains("51401", issueNumbers[releaseInfo]);
         }
     }
 }

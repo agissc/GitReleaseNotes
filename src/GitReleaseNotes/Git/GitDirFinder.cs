@@ -13,16 +13,13 @@ namespace GitReleaseNotes.Git
                 {
                     return gitDir;
                 }
-
                 var parent = Directory.GetParent(workingDirectory);
                 if (parent == null)
                 {
                     break;
                 }
-
                 workingDirectory = parent.FullName;
             }
-
             return null;
         }
     }

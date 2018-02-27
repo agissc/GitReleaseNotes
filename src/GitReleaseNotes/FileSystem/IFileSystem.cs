@@ -5,6 +5,5 @@
         void WriteAllText(string path, string contents);
         string ReadAllText(string path);
         bool FileExists(string path);
-        string GetRepositoryWorkingDirectory(Context context);
     }
 }

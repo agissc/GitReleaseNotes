@@ -47,41 +47,24 @@ namespace GitReleaseNotes
             get { return resolvedOn; }
         }
 
-        public Contributor[] Contributors { get { return contributors; } }
+        public Contributor[] Contributors { get { return contributors; }}
 
-        public string ToString(Categories categories)
+        public string ToString(string[] categories)
         {
-            var formattedcategories = FormatCategories(Tags, categories);
+            var taggedCategory = Tags.FirstOrDefault(t => categories.Any(c => c.Equals(t, StringComparison.InvariantCultureIgnoreCase)));
+            if ("bug".Equals(taggedCategory, StringComparison.InvariantCultureIgnoreCase))
+                taggedCategory = "fix";
+            var category = taggedCategory == null
+                ? null
+                : String.Format(" +{0}", taggedCategory.Replace(" ", "-"));
             var issueNum = IssueNumber == null ? null : String.Format(" [{0}]", IssueNumber);
             var url = HtmlUrl == null ? null : String.Format("({0})", HtmlUrl);
             var contributors = Contributors == null || Contributors.Length == 0 ?
                 string.Empty : " contributed by " + String.Join(", ", Contributors.Select(r => String.Format("{0} ([{1}]({2}))", r.Name, r.Username, r.Url)));
-
-            return string.Format(" - {1}{2}{4}{0}{5}{3}", Title, issueNum, url, formattedcategories,
+            
+            return string.Format(" - {1}{2}{4}{0}{5}{3}", Title, issueNum, url, category,
                 Title.TrimStart().StartsWith("-") ? null : " - ",
                 contributors).Replace("  ", " ").Replace("- -", "-");
-        }
-
-        private string FormatCategories(string[] tags, Categories categories)
-        {
-            var taggedCategories = categories.AllLabels ? Tags : new[] { Tags.FirstOrDefault(t => categories.AvailableCategories.Any(c => c.Equals(t, StringComparison.InvariantCultureIgnoreCase))) };
-
-            if(taggedCategories == null || (taggedCategories.Length == 1 && string.IsNullOrEmpty(taggedCategories[0])))
-            {
-                return null;
-            }
-
-            for (int i = 0; i < taggedCategories.Length; i++)
-            {
-                if ("bug".Equals(taggedCategories[i], StringComparison.InvariantCultureIgnoreCase))
-                {
-                    taggedCategories[i] = "fix";
-                }
-                taggedCategories[i] = string.Concat(" +", taggedCategories[i].Replace(" ", "-"));
-            }
-
-            return string.Join(string.Empty, taggedCategories);
-
         }
     }
 }

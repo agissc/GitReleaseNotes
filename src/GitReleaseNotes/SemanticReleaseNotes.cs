@@ -12,21 +12,25 @@ namespace GitReleaseNotes
         //readonly Regex _issueRegex = new Regex(" - (?<Issue>.*?)(?<IssueLink> \\[(?<IssueId>.*?)\\]\\((?<IssueUrl>.*?)\\))*( *\\+(?<Tag>[^ \\+]*))*", RegexOptions.Compiled);
         static readonly Regex ReleaseRegex = new Regex("# (?<Title>.*?)( \\((?<Date>.*?)\\))?$", RegexOptions.Compiled);
         static readonly Regex LinkRegex = new Regex(@"\[(?<Text>.*?)\]\((?<Link>.*?)\)$", RegexOptions.Compiled);
-        readonly Categories categories;
+        readonly string[] categories;
+        readonly SemanticRelease[] releases;
 
         public SemanticReleaseNotes()
         {
-            categories = new Categories();
-            Releases = new SemanticRelease[0];
+            categories = new string[0];
+            releases = new SemanticRelease[0];
         }
 
-        public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems, Categories categories)
+        public SemanticReleaseNotes(IEnumerable<SemanticRelease> releaseNoteItems, string[] categories)
         {
             this.categories = categories;
-            Releases = releaseNoteItems.ToArray();
+            releases = releaseNoteItems.ToArray();
         }
 
-        public SemanticRelease[] Releases { get; private set; }
+        public SemanticRelease[] Releases
+        {
+            get { return releases; }
+        }
 
         public override string ToString()
         {
@@ -35,9 +39,7 @@ namespace GitReleaseNotes
             foreach (var release in Releases)
             {
                 if (release.ReleaseNoteLines.Count == 0)
-                {
                     continue;
-                }
 
                 if (index++ > 0)
                 {
@@ -49,18 +51,12 @@ namespace GitReleaseNotes
                 {
                     var hasBeenReleased = String.IsNullOrEmpty(release.ReleaseName);
                     if (hasBeenReleased)
-                    {
                         builder.AppendLine("# vNext");
-                    }
                     else if (release.When != null)
-                    {
-                        builder.AppendLine(string.Format("# {0} ({1:dd MMMM yyyy})", release.ReleaseName,
+                        builder.AppendLine(String.Format("# {0} ({1:dd MMMM yyyy})", release.ReleaseName,
                             release.When.Value.Date));
-                    }
                     else
-                    {
-                        builder.AppendLine(string.Format("# {0}", release.ReleaseName));
-                    }
+                        builder.AppendLine(String.Format("# {0}", release.ReleaseName));
 
                     builder.AppendLine();
                 }
@@ -73,12 +69,10 @@ namespace GitReleaseNotes
 
                 builder.AppendLine();
                 if (string.IsNullOrEmpty(release.DiffInfo.DiffUrlFormat))
-                {
-                    builder.AppendLine(string.Format("Commits: {0}...{1}", release.DiffInfo.BeginningSha, release.DiffInfo.EndSha));
-                }
+                    builder.AppendLine(String.Format("Commits: {0}...{1}", release.DiffInfo.BeginningSha, release.DiffInfo.EndSha));
                 else
                 {
-                    builder.AppendLine(string.Format("Commits: [{0}...{1}]({2})",
+                    builder.AppendLine(String.Format("Commits: [{0}...{1}]({2})",
                         release.DiffInfo.BeginningSha, release.DiffInfo.EndSha,
                         string.Format(release.DiffInfo.DiffUrlFormat, release.DiffInfo.BeginningSha, release.DiffInfo.EndSha)));
                 }
@@ -99,19 +93,13 @@ namespace GitReleaseNotes
                 {
                     var match = ReleaseRegex.Match(line);
                     if (line != lines.First())
-                    {
                         releases.Add(currentRelease);
-                    }
-
                     currentRelease = new SemanticRelease
                     {
                         ReleaseName = match.Groups["Title"].Value
                     };
-
                     if (currentRelease.ReleaseName == "vNext")
-                    {
                         currentRelease.ReleaseName = null;
-                    }
 
                     if (match.Groups["Date"].Success)
                     {
@@ -121,7 +109,6 @@ namespace GitReleaseNotes
                         {
                             currentRelease.When = parsed;
                         }
-
                         if (DateTime.TryParseExact(toParse, "dd MMMM yyyy", CultureInfo.InvariantCulture,
                             DateTimeStyles.None, out parsed))
                         {
@@ -148,7 +135,6 @@ namespace GitReleaseNotes
                         commitText = linkMatch.Groups["Text"].Value;
                         currentRelease.DiffInfo.DiffUrlFormat = linkMatch.Groups["Link"].Value;
                     }
-
                     var commits = commitText.Split(new[] { "..." }, StringSplitOptions.None);
                     currentRelease.DiffInfo.BeginningSha = commits[0];
                     currentRelease.DiffInfo.EndSha = commits[1];
@@ -181,28 +167,20 @@ namespace GitReleaseNotes
                 for (int i = 0; i < semanticRelease.ReleaseNoteLines.Count; i++)
                 {
                     if (semanticRelease.ReleaseNoteLines[i] is BlankLine)
-                    {
                         semanticRelease.ReleaseNoteLines.RemoveAt(i--);
-                    }
                     else
-                    {
                         break;
-                    }
                 }
                 for (int i = semanticRelease.ReleaseNoteLines.Count - 1; i >= 0; i--)
                 {
                     if (semanticRelease.ReleaseNoteLines[i] is BlankLine)
-                    {
                         semanticRelease.ReleaseNoteLines.RemoveAt(i);
-                    }
                     else
-                    {
                         break;
-                    }
                 }
             }
 
-            return new SemanticReleaseNotes(releases, new Categories());
+            return new SemanticReleaseNotes(releases, new string[0]);
         }
 
         public SemanticReleaseNotes Merge(SemanticReleaseNotes previousReleaseNotes)
@@ -225,14 +203,13 @@ namespace GitReleaseNotes
                 {
                     semanticRelease.ReleaseNoteLines.AddRange(releaseFromThis.ReleaseNoteLines);
                 }
-                
                 if (releaseFromPrevious != null)
                 {
                     semanticRelease.ReleaseNoteLines.AddRange(releaseFromPrevious.ReleaseNoteLines);
                 }
             }
 
-            return new SemanticReleaseNotes(mergedReleases, new Categories(categories.AvailableCategories.Union(previousReleaseNotes.categories.AvailableCategories).Distinct().ToArray(), categories.AllLabels));
+            return new SemanticReleaseNotes(mergedReleases, categories.Union(previousReleaseNotes.categories).Distinct().ToArray());
         }
 
         private static SemanticRelease CreateMergedSemanticRelease(SemanticRelease r)
