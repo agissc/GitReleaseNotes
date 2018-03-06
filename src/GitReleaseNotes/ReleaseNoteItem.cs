@@ -1,12 +1,16 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace GitReleaseNotes
 {
     public class ReleaseNoteItem : IReleaseNoteLine
     {
         private readonly string title;
+        private string issueTitle;
+        private string issueDescription;
         private readonly string issueNumber;
+        private string jiraUrl;
         private readonly Uri htmlUrl;
         private readonly string[] tags;
         private readonly DateTimeOffset? resolvedOn;
@@ -20,11 +24,22 @@ namespace GitReleaseNotes
             this.tags = tags ?? new string[0];
             this.resolvedOn = resolvedOn;
             this.contributors = contributors;
+            CreateJiraLink();
         }
 
         public string Title
         {
             get { return title; }
+        }
+
+        public string IssueTitle
+        {
+            get { return issueTitle; }
+        }
+
+        public string IssueDescription
+        {
+            get { return issueDescription; }
         }
 
         public Uri HtmlUrl
@@ -42,12 +57,27 @@ namespace GitReleaseNotes
             get { return issueNumber; }
         }
 
+        public string JiraUrl
+        {
+            get { return jiraUrl;}
+        }
+
         public DateTimeOffset? ResolvedOn
         {
             get { return resolvedOn; }
         }
 
         public Contributor[] Contributors { get { return contributors; }}
+
+        private void CreateJiraLink()
+        {
+            issueTitle = title;
+            if (!IssueTitle.Contains(":") || (IssueTitle.Contains(":") && IssueTitle.IndexOf(":") > 15)) return;
+            issueDescription = IssueTitle.Substring(IssueTitle.IndexOf(":"));
+            issueTitle = IssueTitle.Substring(0, IssueTitle.IndexOf(":"));
+            jiraUrl = "(https://jira.ag.ch/browse/" + issueTitle + ")";
+            issueTitle = "[" + issueTitle + "]";
+        }
 
         public string ToString(string[] categories)
         {
@@ -62,9 +92,9 @@ namespace GitReleaseNotes
             var contributors = Contributors == null || Contributors.Length == 0 ?
                 string.Empty : " contributed by " + String.Join(", ", Contributors.Select(r => String.Format("{0} ([{1}]({2}))", r.Name, r.Username, r.Url)));
             
-            return string.Format(" - {1}{2}{4}{0}{5}{3}", Title, issueNum, url, category,
-                Title.TrimStart().StartsWith("-") ? null : " - ",
-                contributors).Replace("  ", " ").Replace("- -", "-");
+            return string.Format(" - {1}{2}{4}{0}{6}{7}{5}{3}", issueTitle, issueNum, url, category,
+                title.TrimStart().StartsWith("-") ? null : " - ",
+                contributors, jiraUrl, issueDescription).Replace("  ", " ").Replace("- -", "-");
         }
     }
 }

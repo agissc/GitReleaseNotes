@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace GitReleaseNotes.FileSystem
 {
@@ -17,6 +18,17 @@ namespace GitReleaseNotes.FileSystem
                 return;
             _fileSystem.WriteAllText(outputFile, releaseNotesOutput);
             Console.WriteLine("Release notes written to {0}", outputFile);
+        }
+
+        public void OutputReleaseNotesHtml(string inputFile, string outputFile)
+        {
+            using (var reader = new StreamReader(inputFile))
+            {
+                using (var writer = new StreamWriter(outputFile))
+                {
+                    CommonMark.CommonMarkConverter.Convert(reader, writer);
+                }
+            }
         }
     }
 }

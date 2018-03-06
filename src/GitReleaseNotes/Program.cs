@@ -120,6 +120,15 @@ namespace GitReleaseNotes
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);
 
+            string outputFileHtml = null;
+            if(!string.IsNullOrEmpty(arguments.OutputFileHtml))
+            {
+                outputFileHtml = Path.IsPathRooted(arguments.OutputFileHtml)
+                    ? arguments.OutputFileHtml
+                    : Path.Combine(repositoryRoot, arguments.OutputFileHtml);
+                releaseFileWriter.OutputReleaseNotesHtml(outputFile, outputFileHtml);
+            }
+
             return 0;
         }
 

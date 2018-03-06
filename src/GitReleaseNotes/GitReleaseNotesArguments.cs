@@ -48,6 +48,9 @@ namespace GitReleaseNotes
         [Description("The release notes file")]
         public string OutputFile { get; set; }
 
+        [Description("The release notes file as HTML")]
+        public string OutputFileHtml { get; set; }
+
         [Description("Allows additional labels to be treated as categories")]
         public string Categories { get; set; }
 
