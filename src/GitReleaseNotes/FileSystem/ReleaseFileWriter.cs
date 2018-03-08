@@ -43,6 +43,8 @@ namespace GitReleaseNotes.FileSystem
             fullHtml = Regex.Replace(fullHtml, "<(a)([^>]+)>", "<$1 target=\"_blank\"$2>");
 
             File.WriteAllText(outputFile, fullHtml);
+
+            Console.WriteLine("Release notes html written to {0}", outputFile);
         }
     }
 }

@@ -92,13 +92,11 @@ namespace GitReleaseNotes
             var fileSystem = new FileSystem.FileSystem();
             var releaseFileWriter = new ReleaseFileWriter(fileSystem);
             string outputFile = null;
-            var previousReleaseNotes = new SemanticReleaseNotes();
             if (!string.IsNullOrEmpty(arguments.OutputFile))
             {
                 outputFile = Path.IsPathRooted(arguments.OutputFile)
                     ? arguments.OutputFile
                     : Path.Combine(repositoryRoot, arguments.OutputFile);
-                previousReleaseNotes = new ReleaseNotesFileReader(fileSystem, repositoryRoot).ReadPreviousReleaseNotes(outputFile);
             }
 
             var categories = arguments.Categories == null ? Categories : Categories.Concat(arguments.Categories.Split(',')).ToArray();
@@ -111,11 +109,7 @@ namespace GitReleaseNotes
                 currentReleaseInfo.Name = arguments.Version;
                 currentReleaseInfo.When = DateTimeOffset.Now;
             }
-            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(
-                gitRepo, issueTracker, 
-                previousReleaseNotes, categories,
-                tagToStartFrom, currentReleaseInfo,
-                issueTracker.DiffUrlFormat);
+            var releaseNotes = ReleaseNotesGenerator.GenerateReleaseNotes(gitRepo, issueTracker, categories, tagToStartFrom, currentReleaseInfo, issueTracker.DiffUrlFormat);
 
             var releaseNotesOutput = releaseNotes.ToString();
             releaseFileWriter.OutputReleaseNotesFile(releaseNotesOutput, outputFile);

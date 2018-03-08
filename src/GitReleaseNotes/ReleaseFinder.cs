@@ -18,7 +18,7 @@ namespace GitReleaseNotes
                 if (tagLookup.ContainsKey(commit.Sha))
                 {
                     var tag = tagLookup[commit.Sha];
-                    var releaseDate = ((Commit) tag.Target).Author.When;
+                    var releaseDate = (((Commit) tag.Target).Author.When).AddMinutes(1); // Last commit of the tag is before the last issue of the tag closes. Add a minute to fix this
                     current.PreviousReleaseDate = releaseDate;
                     current = new ReleaseInfo(tag.Name, releaseDate, null)
                         {
