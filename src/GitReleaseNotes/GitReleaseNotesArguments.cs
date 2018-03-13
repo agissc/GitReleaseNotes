@@ -62,5 +62,17 @@ namespace GitReleaseNotes
 
         [Description("BitBuckets Consumer Secret Key used for Oauth authentication")]
         public string ConsumerSecretKey { get; set; }
+
+        [Description("Specifies if all jira issues should get tagged with the release they were deployed in")]
+        public bool TagJiraIssues { get; set; }
+
+        [Description("Account id for the user that will tag the jira issues")]
+        public string JiraAccountId { get; set; }
+
+        [Description("Password for the user that will tag the jira issues")]
+        public string JiraPassword { get; set; }
+
+        [Description("Comma-separated project names that will not be tagged in jira (i.e. 'SV,AV')")]
+        public string ExcludedJiraProjects { get; set; }
     }
 }

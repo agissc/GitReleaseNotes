@@ -123,6 +123,12 @@ namespace GitReleaseNotes
                 releaseFileWriter.OutputReleaseNotesHtml(outputFile, outputFileHtml);
             }
 
+            if (arguments.TagJiraIssues)
+            {
+                var jiraIssueTagger = new JiraIssueTagger();
+                jiraIssueTagger.TagAllIssues(releaseNotes.ToString(), arguments.JiraAccountId, arguments.JiraPassword, arguments.ExcludedJiraProjects);
+            }
+
             return 0;
         }
 

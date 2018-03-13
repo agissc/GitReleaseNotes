@@ -73,6 +73,7 @@ namespace GitReleaseNotes
         {
             issueTitle = title;
             if (!IssueTitle.Contains(":") || (IssueTitle.Contains(":") && IssueTitle.IndexOf(":") > 15)) return;
+            if (!IssueTitle.Substring(0, IssueTitle.IndexOf(":")).Contains("-")) return;
             issueDescription = IssueTitle.Substring(IssueTitle.IndexOf(":"));
             issueTitle = IssueTitle.Substring(0, IssueTitle.IndexOf(":"));
             jiraUrl = "(https://jira.ag.ch/browse/" + issueTitle + ")";
