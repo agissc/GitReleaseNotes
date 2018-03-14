@@ -51,7 +51,7 @@ namespace GitReleaseNotes
                     string issueKey = line.Substring(issueNameStartIndex, issueNameEndIndex - issueNameStartIndex).ToUpper();
                     if (!(IsExcluded(issueKey, excludedProjects.Split(',')) || release == ""))
                     {
-                        Console.WriteLine("Tagging Issue {0} with {1}", issueKey, release);
+                        Console.WriteLine("Tagging Jira issue {0} with {1}", issueKey, release);
                         TagJiraIssue(issueKey, release, accountId, password);
                     }
                 }
@@ -93,9 +93,9 @@ namespace GitReleaseNotes
                 const string message = "Error retrieving response.  Check inner details for more info.";
                 var jiraManagerException = new ApplicationException(message, response.ErrorException);
                 throw jiraManagerException;
+                Console.WriteLine(message + " " + response.ErrorException);
             }
 
-            //Console.WriteLine("Response content: {0}", response.Content);
             return response.Content;
         }
     }

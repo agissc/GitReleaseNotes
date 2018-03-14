@@ -108,13 +108,17 @@ namespace GitReleaseNotes.IssueTrackers.GitHub
             GetRepository(arguments, out organisation, out repository);
 
             var gitHubClient = gitHubClientFactory();
+            var pullRequests = gitHubClient.PullRequest.GetAllForRepository(organisation, repository, new PullRequestRequest
+            {
+                State = ItemStateFilter.All
+            });
             var forRepository = gitHubClient.Issue.GetAllForRepository(organisation, repository, new RepositoryIssueRequest
             {
                 Filter = IssueFilter.All,
                 Since = since,
                 State = ItemStateFilter.Closed
             });
-            var readOnlyList = forRepository.Result.Where(i => i.ClosedAt > since);
+            var readOnlyList = forRepository.Result.Where(i => i.ClosedAt > since).Where(i => pullRequests.Result.Where(j => j.Number == i.Number).First().Merged);
 
             var userCache = new Dictionary<string, User>();
             Func<User, string> getUserName = u =>
