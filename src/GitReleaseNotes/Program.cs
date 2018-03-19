@@ -126,7 +126,7 @@ namespace GitReleaseNotes
             if (arguments.TagJiraIssues)
             {
                 var jiraIssueTagger = new JiraIssueTagger();
-                jiraIssueTagger.TagAllIssues(releaseNotes.ToString(), arguments.JiraAccountId, arguments.JiraPassword, arguments.ExcludedJiraProjects);
+                jiraIssueTagger.TagIssues(releaseNotes.ToString(), arguments.JiraAccountId, arguments.JiraPassword, arguments.ExcludedJiraProjects, arguments.TagAllJiraIssues);
             }
 
             return 0;

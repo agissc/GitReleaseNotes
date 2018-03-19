@@ -16,9 +16,10 @@ namespace GitReleaseNotes
         private const string JIRA_URL = "https://jira.ag.ch/rest/api/2/";
         private const string UNRELEASED_TAG = "vNext";
 
-        public void TagAllIssues(string releaseNotes, string accountId, string password, string excludedProjects)
+        public void TagIssues(string releaseNotes, string accountId, string password, string excludedProjects, bool tagAllIssues)
         {
             StringReader reader = new StringReader(releaseNotes);
+            int releaseCounter = 0;
             string release = "";
             string releaseBuildNumber = "";
             DateTime releaseDate;
@@ -33,9 +34,11 @@ namespace GitReleaseNotes
                 {
                     if (line.StartsWith("# rel-isagis-") && line.Contains('('))
                     {
+                        if (!tagAllIssues && releaseCounter == 1) return;
                         releaseBuildNumber = line.Substring(13, line.IndexOf('(') - 14);
                         releaseDate = DateTime.ParseExact(line.Substring(line.IndexOf('(') + 1, line.IndexOf(')') - line.IndexOf('(') - 1), "dd MMMM yyyy", CultureInfo.CurrentCulture);
                         release = releaseDate.Year + "." + releaseDate.Month + "." + releaseBuildNumber;
+                        releaseCounter++;
                     }
                     else if (line == "# vNext")
                     {
@@ -80,7 +83,7 @@ namespace GitReleaseNotes
         }
 
         /// <summary>
-        /// Tags a JIRA issue with a certain tag. If existing, also removes the unreleased tag on the issue.
+        /// Tags a JIRA issue with a certain tag if it hasn't this tag already. If existing, also removes the unreleased tag on the issue.
         /// </summary>
         /// <param name="issueKey">Name of the JIRA issue (i.e. AV-45)</param>
         /// <param name="tag">String the issue should get tagged with</param>
@@ -91,7 +94,12 @@ namespace GitReleaseNotes
             Console.WriteLine("Tagging Jira issue {0} with {1}", issueKey, tag);
             if (tag == UNRELEASED_TAG && HasReleaseTag(issueKey, accountId, password))
             {
-                Console.WriteLine("Will not tag issue {0} with {1} because it already has a release tag.", issueKey, tag);
+                Console.WriteLine("Will not tag issue {0} with {1} because another branch with this issue has alread been released", issueKey, tag);
+                return;
+            }
+            if(GetLabels(issueKey, accountId, password).Contains(tag))
+            {
+                Console.WriteLine("Will not tag issue {0} with {1} because the issue already contains this tag", issueKey, tag);
                 return;
             }
             if (tag != UNRELEASED_TAG) RemoveUnreleasedTag(issueKey, accountId, password);
@@ -128,7 +136,7 @@ namespace GitReleaseNotes
         }
 
         /// <summary>
-        /// Checks and returns if the issue has a release tag (i.e. 2018.4.5234)
+        /// Checks and returns if the issue has a release tag attached to it
         /// </summary>
         private bool HasReleaseTag(string issueKey, string accountId, string password)
         {

@@ -74,5 +74,8 @@ namespace GitReleaseNotes
 
         [Description("Comma-separated project names that will not be tagged in jira (i.e. 'SV,AV')")]
         public string ExcludedJiraProjects { get; set; }
+
+        [Description("Specifies that all jira issues should be checked for tagging, instead of just the issues in vNext and the latest release")]
+        public bool TagAllJiraIssues { get; set; }
     }
 }
