@@ -113,3 +113,6 @@ src/_NCrunch_GitReleaseNotes
 *.received.txt
 src/GitReleaseNotes.sln.ide/
 *.GhostDoc.xml
+
+# Visual Studio
+.vs/

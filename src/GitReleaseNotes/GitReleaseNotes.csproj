@@ -67,6 +67,7 @@
     <Compile Include="ArgumentVerifier.cs" />
     <Compile Include="BlankLine.cs" />
     <Compile Include="Contributor.cs" />
+    <Compile Include="RepositoryHelper.cs" />
     <Compile Include="IReleaseNoteLine.cs" />
     <Compile Include="IssueTrackers\BitBucket\BitBucketIssueTracker.cs" />
     <Compile Include="IssueTrackers\BitBucket\IBitBucketApi.cs" />
