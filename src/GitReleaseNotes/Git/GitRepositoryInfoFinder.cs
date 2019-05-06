@@ -23,7 +23,7 @@ namespace GitReleaseNotes.Git
         private static TaggedCommit GetTag(IRepository gitRepo, string fromTag)
         {
             if (!Cache.ContainsKey(fromTag))
-                Cache.Add(fromTag, GetLastTaggedCommit(gitRepo, t => string.IsNullOrEmpty(fromTag) || t.TagName == fromTag));
+                Cache.Add(fromTag, GetLastTaggedCommit(gitRepo, t => string.IsNullOrEmpty(fromTag) || t.TagName.Equals(fromTag)));
 
             return Cache[fromTag];
         }
@@ -36,13 +36,14 @@ namespace GitReleaseNotes.Git
                 .Where(filterTags)
                 .ToArray();
             var olderThan = branch.Tip.Author.When;
+            var allCommits = gitRepo.GetCommitsRecursive();
             var lastTaggedCommit =
-                branch.Commits.FirstOrDefault(c => c.Author.When <= olderThan && tags.Any(a => a.Commit == c));
+                allCommits.FirstOrDefault(c => c.Author.When <= olderThan && tags.Any(a => a.Commit.Equals(c)));
 
             if (lastTaggedCommit != null)
                 return tags.Last(a => a.Commit.Sha == lastTaggedCommit.Sha);
 
-            return new TaggedCommit(branch.Commits.Last(), "Initial Commit");
+            return new TaggedCommit(allCommits.Last(), "Initial Commit");
         }
 
         public static ReleaseInfo GetCurrentReleaseInfo(IRepository repo)
@@ -52,7 +53,7 @@ namespace GitReleaseNotes.Git
             if (head.Tip.Sha == lastTaggedCommit.Commit.Sha)
                 return new ReleaseInfo(null, null, lastTaggedCommit.Commit.Author.When);
 
-            var firstCommitAfterLastTag = head.Commits.TakeWhile(c => c.Id != lastTaggedCommit.Commit.Id).Last().Sha;
+            var firstCommitAfterLastTag = repo.GetCommitsRecursive().TakeWhile(c => c.Id != lastTaggedCommit.Commit.Id).Last().Sha;
             return new ReleaseInfo(null, null, lastTaggedCommit.Commit.Author.When)
             {
                 FirstCommit = firstCommitAfterLastTag,
