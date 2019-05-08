@@ -22,8 +22,8 @@ namespace GitReleaseNotes
                     .Where(i => (release.When == null || i.DateClosed < release.When) && (release.PreviousReleaseDate == null || i.DateClosed > release.PreviousReleaseDate))
                     .Select(i => new ReleaseNoteItem(i.Title, i.Id, i.HtmlUrl, i.Labels, i.DateClosed, i.Contributors))
                     .ToList<IReleaseNoteLine>()
-                let beginningSha = release.FirstCommit?.Substring(0, 10)
-                let endSha = release.LastCommit?.Substring(0, 10)
+                let beginningSha = release.FirstCommit == null ? null : release.FirstCommit.Substring(0, 10)
+                let endSha = release.LastCommit == null ? null : release.LastCommit.Substring(0, 10)
                 select new SemanticRelease(release.Name, release.When, releaseNoteItems, new ReleaseDiffInfo
                 {
                     BeginningSha = beginningSha, 
