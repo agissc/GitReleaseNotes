@@ -13,8 +13,7 @@ namespace GitReleaseNotes
         {
             var releases = new List<ReleaseInfo> {current};
             var tagLookup = TagsByShaMap(gitRepo);
-            var allCommits = gitRepo.GetCommitsRecursive();
-            foreach (var commit in allCommits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
+            foreach (var commit in gitRepo.Commits.TakeWhile(c => tagToStartFrom == null || c != tagToStartFrom.Commit))
             {
                 if (tagLookup.ContainsKey(commit.Sha))
                 {

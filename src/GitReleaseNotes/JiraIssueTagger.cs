@@ -143,7 +143,8 @@ namespace GitReleaseNotes
             string[] labels = GetLabels(issueKey, accountId, password);
             foreach(string label in labels)
             {
-                if (Version.TryParse(label, out Version v)) return true;
+                Version v = null;
+                if (Version.TryParse(label, out v)) return true;
             }
             return false;
         }
